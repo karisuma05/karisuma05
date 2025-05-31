@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>総合占いアプリ NEO ★DX★ GIGA MAX</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: linear-gradient(135deg, #FFD700 0%, #FF1493 50%, #8A2BE2 100%); 
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.92); 
+            padding: 2rem;
+            border-radius: 1.5rem; 
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), 0 0 20px #FFD700, 0 0 30px rgba(255,223,0,0.5) inset;
+            border: 3px solid #FFC700; 
+            text-align: center;
+            width: 100%;
+            max-width: 720px; 
+        }
+        .app-title {
+            font-size: 2.8rem; 
+            font-weight: 700;
+            color: #C71585; 
+            text-shadow: 1px 1px 0px #FFD700, 2px 2px 0px #FF69B4, 0 0 15px #FF1493;
+            margin-bottom: 1.5rem;
+            letter-spacing: 1px;
+        }
+        .tabs {
+            display: flex;
+            flex-wrap: wrap; 
+            justify-content: center;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #FFD700; 
+        }
+        .tab-button {
+            padding: 0.6rem 1.1rem; 
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            font-size: 0.9rem; 
+            font-weight: 700; 
+            color: #8A2BE2; 
+            transition: all 0.3s ease;
+            border-bottom: 4px solid transparent;
+            margin: 0.2rem; 
+            text-shadow: 1px 1px 1px rgba(255,255,255,0.7);
+        }
+        .tab-button.active {
+            color: #FF1493; 
+            border-bottom: 4px solid #FF1493;
+            background-color: rgba(255, 215, 0, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .tab-button:hover:not(.active) {
+            color: #FF69B4; 
+            border-bottom-color: #FFD700; 
+        }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.6s ease-out;
+            text-align: left; 
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .section-title {
+            font-size: 1.8rem; 
+            font-weight: 700; 
+            color: #8A2BE2; 
+            margin-bottom: 1.5rem;
+            text-align: center;
+            text-shadow: 1px 1px 1px #FFD700;
+        }
+        .button {
+            background: linear-gradient(45deg, #FF69B4, #C71585);
+            color: white;
+            font-weight: bold;
+            padding: 0.85rem 2.2rem; 
+            border-radius: 50px; 
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid #FFD700; 
+            font-size: 1.05rem; 
+            box-shadow: 0 5px 15px rgba(255, 20, 147, 0.4), 0 2px 5px rgba(0,0,0,0.2);
+            margin-top: 1.2rem;
+            display: inline-block; 
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+        }
+        .button:hover {
+            background: linear-gradient(45deg, #C71585, #FF1493);
+            transform: scale(1.08) translateY(-2px); 
+            box-shadow: 0 8px 25px rgba(255, 20, 147, 0.6), 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .button:active {
+            transform: scale(1.02) translateY(0px);
+        }
+        .result-area {
+            margin-top: 1.5rem; 
+            padding: 1.8rem; 
+            background-color: rgba(255, 240, 245, 0.9); 
+            border-radius: 1rem;
+            min-height: 140px; 
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; 
+            align-items: stretch; 
+            border: 3px dashed #FF69B4; 
+            box-shadow: inset 0 0 10px rgba(255,105,180,0.3);
+        }
+        /* Combined title styles for fortune results */
+        .fortune-text, .birthday-result-title, .astro-sign-title, .eto-title, .new-fortune-title {
+            font-size: 1.5rem; 
+            font-weight: 700; 
+            color: #C71585; 
+            margin-bottom: 0.75rem;
+            text-align: center;
+            text-shadow: 1px 1px 1px rgba(255,255,255,0.8);
+        }
+        /* Combined description styles for fortune results */
+        .description-text, .birthday-result-text, .astro-description, .eto-description, .new-fortune-description {
+            font-size: 1rem; 
+            color: #4B0082; 
+            margin-top: 0.5rem;
+            line-height: 1.7; 
+        }
+        .lucky-item-text {
+             font-size: 1.1rem; 
+             color: #FF4500; 
+             font-weight: bold;
+             margin-top: 1rem;
+             text-align: center;
+             text-shadow: 1px 1px 0px #FFD700;
+        }
+        .input-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #8A2BE2; 
+            font-weight: 700; 
+            font-size: 1rem;
+        }
+        .input-group input[type="date"], .input-group input[type="number"] {
+            width: 100%;
+            padding: 0.85rem; 
+            border: 2px solid #FFD700; 
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            background-color: #fff5e6; 
+        }
+        .input-group input[type="date"]:focus, .input-group input[type="number"]:focus {
+            border-color: #FF69B4; 
+            box-shadow: 0 0 8px rgba(255,105,180,0.5);
+        }
+        .disclaimer {
+            font-size: 0.85rem; 
+            color: #FF1493; 
+            margin-top: 1rem;
+            text-align: center;
+            font-weight: bold;
+        }
+        .message-box {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #FF69B4; 
+            color: white;
+            padding: 18px 25px; 
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out, top 0.5s ease-in-out;
+            text-align: center;
+            font-size: 1.1rem;
+            border: 2px solid #FFD700;
+        }
+        .message-box.show {
+            opacity: 1;
+            top: 60px; 
+        }
+        .message-box.error {
+            background-color: #DC143C; 
+            border-color: #FFD700;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="app-title">★ 総合占いアプリ NEO DX GIGA MAX ★</h1>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab(event, 'dailyFortune')">今日の運勢</button>
+            <button class="tab-button" onclick="openTab(event, 'birthdayFortune')">誕生日占い (日の数字)</button> 
+            <button class="tab-button" onclick="openTab(event, 'westernAstrology')">太陽星座占い (性格)</button> 
+            <button class="tab-button" onclick="openTab(event, 'easternAstrology')">東洋占術 (干支)</button>
+            <button class="tab-button" onclick="openTab(event, 'pastLifeAnimalFortune')">前世動物占い</button>
+            <button class="tab-button" onclick="openTab(event, 'pastLifeJobFortune')">前世職業占い</button>
+            <button class="tab-button" onclick="openTab(event, 'destinyNumberFortune')">運命数占い</button>
+            <button class="tab-button" onclick="openTab(event, 'sengokuWarlordFortune')">戦国武将占い</button>
+            <button class="tab-button" onclick="openTab(event, 'guardianDeityFortune')">守護神占い</button>
+            <button class="tab-button" onclick="openTab(event, 'foodFortune')">食べ物占い</button>
+            <button class="tab-button" onclick="openTab(event, 'simpleZodiacFortune')">今日の星座アドバイス</button>
+        </div>
+
+        <div id="dailyFortune" class="tab-content active">
+            <h2 class="section-title">今日のあなたの運勢は？</h2>
+            <button id="dailyFortuneButton" class="button">占う</button>
+            <div id="dailyResultArea" class="result-area">
+                <p class="text-center">「占う」ボタンを押してね！</p>
+            </div>
+        </div>
+
+        <div id="birthdayFortune" class="tab-content"> 
+            <h2 class="section-title">誕生日占い (日の数字)</h2> 
+            <div class="input-group">
+                <label for="birthdate">生年月日を入力してください:</label>
+                <input type="date" id="birthdate" name="birthdate">
+            </div>
+            <button id="birthdayFortuneButton" class="button">占う</button>
+            <div id="birthdayResultArea" class="result-area">
+                <p class="text-center">生年月日を入力して「占う」ボタンを押してね！</p>
+            </div>
+            <p class="disclaimer">※この占いは誕生日の「日」を基にした簡易的なものです。</p>
+        </div>
+
+        <div id="westernAstrology" class="tab-content"> 
+            <h2 class="section-title">太陽星座占い (性格)</h2> 
+            <div class="input-group">
+                <label for="astroBirthdate">生年月日を入力してください:</label>
+                <input type="date" id="astroBirthdate" name="astroBirthdate">
+            </div>
+            <button id="westernAstrologyButton" class="button">占う</button>
+            <div id="westernAstrologyResultArea" class="result-area">
+                <p class="text-center">生年月日を入力して「占う」ボタンを押してね！</p>
+            </div>
+        </div>
+
+        <div id="easternAstrology" class="tab-content">
+            <h2 class="section-title">東洋占術 (干支)</h2>
+            <div class="input-group">
+                <label for="birthYear">生まれ年 (西暦) を入力してください:</label>
+                <input type="number" id="birthYear" name="birthYear" min="1900" max="2099" placeholder="例: 1990">
+            </div>
+            <button id="easternAstrologyButton" class="button">占う</button>
+            <div id="easternAstrologyResultArea" class="result-area">
+                <p class="text-center">生まれ年を入力して「占う」ボタンを押してね！</p>
+            </div>
+        </div>
+
+        <div id="pastLifeAnimalFortune" class="tab-content">
+            <h2 class="section-title">あなたの前世の動物は？</h2>
+            <button id="pastLifeAnimalButton" class="button">占う</button>
+            <div id="pastLifeAnimalResultArea" class="result-area">
+                <p class="text-center">「占う」ボタンであなたの前世の動物を占います！</p>
+            </div>
+        </div>
+
+        <div id="pastLifeJobFortune" class="tab-content">
+            <h2 class="section-title">あなたの前世の職業は？</h2>
+            <button id="pastLifeJobButton" class="button">占う</button>
+            <div id="pastLifeJobResultArea" class="result-area">
+                <p class="text-center">「占う」ボタンであなたの前世の職業を占います！</p>
+            </div>
+        </div>
+
+        <div id="destinyNumberFortune" class="tab-content">
+            <h2 class="section-title">運命数占い (生年月日全体)</h2>
+            <div class="input-group">
+                <label for="destinyNumberBirthdate">生年月日を入力してください:</label>
+                <input type="date" id="destinyNumberBirthdate" name="destinyNumberBirthdate">
+            </div>
+            <button id="destinyNumberButton" class="button">占う</button>
+            <div id="destinyNumberResultArea" class="result-area">
+                <p class="text-center">生年月日を入力して「占う」ボタンを押してね！</p>
+            </div>
+        </div>
+
+        <div id="sengokuWarlordFortune" class="tab-content">
+            <h2 class="section-title">あなたを戦国武将に例えると？</h2>
+            <button id="sengokuWarlordButton" class="button">占う</button>
+            <div id="sengokuWarlordResultArea" class="result-area">
+                <p class="text-center">「占う」ボタンであなたを戦国武将に例えます！</p>
+            </div>
+        </div>
+
+        <div id="guardianDeityFortune" class="tab-content">
+            <h2 class="section-title">あなたの守護神は？</h2>
+            <button id="guardianDeityButton" class="button">占う</button>
+            <div id="guardianDeityResultArea" class="result-area">
+                <p class="text-center">「占う」ボタンであなたの守護神を占います！</p>
+            </div>
+        </div>
+
+        <div id="foodFortune" class="tab-content">
+            <h2 class="section-title">今日のラッキーフード占い</h2>
+            <button id="foodFortuneButton" class="button">占う</button>
+            <div id="foodFortuneResultArea" class="result-area">
+                <p class="text-center">「占う」ボタンで今日のラッキーフードを占います！</p>
+            </div>
+        </div>
+
+        <div id="simpleZodiacFortune" class="tab-content">
+            <h2 class="section-title">今日の星座アドバイス (簡易)</h2>
+            <div class="input-group">
+                <label for="simpleZodiacBirthdate">生年月日を入力してください:</label>
+                <input type="date" id="simpleZodiacBirthdate" name="simpleZodiacBirthdate">
+            </div>
+            <button id="simpleZodiacButton" class="button">占う</button>
+            <div id="simpleZodiacResultArea" class="result-area">
+                <p class="text-center">生年月日を入力して「占う」ボタンを押してね！</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="messageBox" class="message-box"></div>
+
+    <script>
+        // DOM Elements (Existing)
+        const dailyFortuneButton = document.getElementById('dailyFortuneButton');
+        const dailyResultArea = document.getElementById('dailyResultArea');
+        // Tarot elements removed
+        const birthdayFortuneButton = document.getElementById('birthdayFortuneButton');
+        const birthdateInput = document.getElementById('birthdate');
+        const birthdayResultArea = document.getElementById('birthdayResultArea');
+        const westernAstrologyButton = document.getElementById('westernAstrologyButton');
+        const astroBirthdateInput = document.getElementById('astroBirthdate');
+        const westernAstrologyResultArea = document.getElementById('westernAstrologyResultArea');
+        const easternAstrologyButton = document.getElementById('easternAstrologyButton');
+        const birthYearInput = document.getElementById('birthYear');
+        const easternAstrologyResultArea = document.getElementById('easternAstrologyResultArea');
+        const messageBox = document.getElementById('messageBox');
+
+        // DOM Elements (New Fortunes)
+        const pastLifeAnimalButton = document.getElementById('pastLifeAnimalButton');
+        const pastLifeAnimalResultArea = document.getElementById('pastLifeAnimalResultArea');
+        const pastLifeJobButton = document.getElementById('pastLifeJobButton');
+        const pastLifeJobResultArea = document.getElementById('pastLifeJobResultArea');
+        const destinyNumberBirthdateInput = document.getElementById('destinyNumberBirthdate');
+        const destinyNumberButton = document.getElementById('destinyNumberButton');
+        const destinyNumberResultArea = document.getElementById('destinyNumberResultArea');
+        const sengokuWarlordButton = document.getElementById('sengokuWarlordButton');
+        const sengokuWarlordResultArea = document.getElementById('sengokuWarlordResultArea');
+        const guardianDeityButton = document.getElementById('guardianDeityButton');
+        const guardianDeityResultArea = document.getElementById('guardianDeityResultArea');
+        const foodFortuneButton = document.getElementById('foodFortuneButton');
+        const foodFortuneResultArea = document.getElementById('foodFortuneResultArea');
+        const simpleZodiacBirthdateInput = document.getElementById('simpleZodiacBirthdate');
+        const simpleZodiacButton = document.getElementById('simpleZodiacButton');
+        const simpleZodiacResultArea = document.getElementById('simpleZodiacResultArea');
+
+        function openTab(event, tabName) { const tabContents = document.getElementsByClassName("tab-content"); for (let i = 0; i < tabContents.length; i++) { tabContents[i].style.display = "none"; tabContents[i].classList.remove("active"); } const tabButtons = document.getElementsByClassName("tab-button"); for (let i = 0; i < tabButtons.length; i++) { tabButtons[i].classList.remove("active"); } document.getElementById(tabName).style.display = "block"; document.getElementById(tabName).classList.add("active"); event.currentTarget.classList.add("active"); }
+        function showMessage(message, type = 'success', duration = 3000) { messageBox.textContent = message; messageBox.className = 'message-box'; if (type === 'error') { messageBox.classList.add('error'); } messageBox.classList.add('show'); setTimeout(() => { messageBox.classList.remove('show'); }, duration); }
+
+        // Daily Fortune (Existing)
+        const dailyFortunes = [ { name: "超絶大吉MAX", description: "天があなたの味方をする！何をやっても想像以上の結果が！億万長者も夢じゃない！？" }, { name: "ギラギラ大吉", description: "スポットライトはあなたのもの！努力がキラキラ輝き、周囲を魅了するでしょう。" }, { name: "そこそこ吉", description: "まあまあ良い日。油断しなければ、小さなハッピーが訪れるかも。" }, { name: "フィーバー吉", description: "気分上々↑↑。思わぬところから幸運が舞い込むサプライズデー！" }, { name: "ギリ吉", description: "運気は可もなく不可もなし、からのちょいアゲ。謙虚さを忘れずに。" }, { name: "ぴえん凶", description: "ちょっとアンラッキー。大きな決断は避けて、おとなしく過ごすのが吉。" }, { name: "絶望大凶", description: "今日は何をやっても裏目に出るかも…。ラッキーアイテムを身に着けて、嵐が過ぎるのを待とう。" } ];
+        const luckyItems = ["金の延べ棒の模型", "ダイヤ風ネックレス", "孔雀柄の扇子", "シャンパングラスの置物", "虹色のラメ入りペン", "星屑デザインの砂時計", "魔法の杖キーホルダー", "龍の置物フィギュア"];
+        const luckyColors = ["ド派手ゴールド", "ショッキングピンクデラックス", "ロイヤルパープルシャイン", "エメラルドグリーンフラッシュ", "ルビーレッドインパクト", "サファイアブルースター", "ダイヤモンドクリアスパークル", "レインボーオーラMAX"];
+        function tellDailyFortune() { try { const fortuneIndex = Math.floor(Math.random() * dailyFortunes.length); const selectedFortune = dailyFortunes[fortuneIndex]; let luckyCharm; if (Math.random() < 0.5) { const itemIndex = Math.floor(Math.random() * luckyItems.length); luckyCharm = `ラッキーアイテム： ${luckyItems[itemIndex]}`; } else { const colorIndex = Math.floor(Math.random() * luckyColors.length); luckyCharm = `ラッキーカラー： ${luckyColors[colorIndex]}`; } dailyResultArea.innerHTML = `<p class="fortune-text">今日のあなたの運勢は【${selectedFortune.name}】です！</p><p class="description-text text-center">${selectedFortune.description}</p><p class="lucky-item-text">${luckyCharm}</p>`; } catch (error) { console.error("今日の運勢占いでエラー:", error); dailyResultArea.innerHTML = `<p class="fortune-text" style="color: red;">エラーが発生しました。</p>`; showMessage("今日の運勢占いでエラーが発生しました。", "error"); } }
+        if(dailyFortuneButton) dailyFortuneButton.addEventListener('click', tellDailyFortune);
+
+        // Tarot Fortune Removed
+
+        // Birthday Fortune (Day Number) (Existing - Renamed)
+        const birthdayFortunesData = { 1: { name: "開拓者", description: "リーダーシップがあり、新しいことを始めるのが得意。情熱的でエネルギッシュですが、時に自己中心的になることも。" }, 2: { name: "協調者", description: "優しく、思いやりがあり、調和を大切にします。サポート役が得意ですが、決断力に欠けることも。" }, 3: { name: "表現者", description: "明るく、社交的で、創造性に溢れています。コミュニケーション能力が高いですが、飽きっぽい一面も。" }, 4: { name: "建設者", description: "真面目で、努力家、安定を求めます。現実的で計画性がありますが、頑固なところも。" }, 5: { name: "自由人", description: "好奇心旺盛で、変化を好み、自由を愛します。多才で適応力がありますが、束縛を嫌います。" }, 6: { name: "教育者", description: "責任感が強く、愛情深く、美的センスがあります。面倒見が良いですが、おせっかいになることも。" }, 7: { name: "探求者", description: "分析力があり、知的好奇心が強く、神秘的なことを好みます。独自の視点を持っていますが、孤立しやすいことも。" }, 8: { name: "実践者", description: "野心的で、行動力があり、組織をまとめる力があります。成功を掴む力がありますが、時に強引になることも。" }, 9: { name: "奉仕者", description: "理想主義で、博愛精神に溢れ、人道的です。多くの人に影響を与えますが、現実離れすることも。" }, 11: { name: "直感のメッセンジャー", description: "鋭い直感力を持ち、スピリチュアルなことに関心が高いです。理想が高く、影響力がありますが、神経質な面も。" }, 22: { name: "マスタービルダー", description: "大きな理想を実現する力を持つ、カリスマ的なリーダー。現実的な実行力と理想を兼ね備えますが、プレッシャーも大きいです。" }};
+        function calculateLifePathNumber(birthDateStr) { if (!birthDateStr) return null; const day = new Date(birthDateStr).getDate(); let sum = day; while (sum > 9 && sum !== 11 && sum !== 22) { sum = String(sum).split('').reduce((acc, digit) => acc + parseInt(digit), 0); } return sum; }
+        function tellBirthdayFortune() { const birthDateValue = birthdateInput.value; if (!birthDateValue) { showMessage("生年月日を入力してください。", "error"); birthdayResultArea.innerHTML = `<p class="new-fortune-description text-center" style="color: red;">生年月日が入力されていません。</p>`; return; } try { const lifePathNumber = calculateLifePathNumber(birthDateValue); let result; if (birthdayFortunesData[lifePathNumber]) { const fortune = birthdayFortunesData[lifePathNumber]; result = `<p class="new-fortune-title">あなたの基本性質（誕生日の日から）： ${fortune.name}</p><p class="new-fortune-description">${fortune.description}</p>`; } else { const birthDateObj = new Date(birthDateValue); const month = birthDateObj.getMonth() + 1; const day = birthDateObj.getDate(); const zodiacSigns = ["山羊座", "水瓶座", "魚座", "牡羊座", "牡牛座", "双子座", "蟹座", "獅子座", "乙女座", "天秤座", "蠍座", "射手座", "山羊座"]; const lastDayOfMonth = [0, 19, 18, 20, 20, 21, 22, 22, 22, 23, 23, 22, 21]; let signIndex = month -1; if (day > lastDayOfMonth[month]) { signIndex = month % 12; } let sign = zodiacSigns[signIndex]; if (month === 1 && day <= 19) sign = "山羊座"; if (month === 2 && day <=18) sign = "水瓶座"; result = `<p class="new-fortune-title">あなたの星座（参考）： ${sign}</p><p class="new-fortune-description">あなたの星座は${sign}です。今日は${sign}にとって穏やかな一日となるでしょう。</p>`; } birthdayResultArea.innerHTML = result; } catch (error) { console.error("誕生日占いでエラー:", error); birthdayResultArea.innerHTML = `<p class="new-fortune-title text-center" style="color: red;">エラーが発生しました。</p>`; showMessage("誕生日占いでエラーが発生しました。", "error"); } }
+        if(birthdayFortuneButton) birthdayFortuneButton.addEventListener('click', tellBirthdayFortune);
+
+        // Sun Sign Fortune (Personality) (Existing - Renamed)
+        const zodiacData = [ { sign: "牡羊座", start: "03-21", end: "04-19", description: "情熱的で行動力があり、リーダーシップを発揮します。新しいことへの挑戦を恐れません。" }, { sign: "牡牛座", start: "04-20", end: "05-20", description: "穏やかで忍耐強く、美的感覚に優れています。安定と物質的な豊かさを大切にします。" }, { sign: "双子座", start: "05-21", end: "06-21", description: "知的好奇心が旺盛でコミュニケーション能力が高いです。多才で順応性があります。" }, { sign: "蟹座", start: "06-22", end: "07-22", description: "感受性豊かで、家庭や仲間を大切にします。共感力が高く、思いやりがあります。" }, { sign: "獅子座", start: "07-23", end: "08-22", description: "自己表現力豊かで、ドラマチックなことを好みます。寛大でプライドが高いです。" }, { sign: "乙女座", start: "08-23", end: "09-22", description: "分析力に優れ、完璧主義な面があります。勤勉で実務能力が高いです。" }, { sign: "天秤座", start: "09-23", end: "10-23", description: "バランス感覚に優れ、社交的です。美的センスがあり、調和を重んじます。" }, { sign: "蠍座", start: "10-24", end: "11-22", description: "探求心が強く、洞察力に優れています。情熱的で、一度決めたことは最後までやり遂げます。" }, { sign: "射手座", start: "11-23", end: "12-21", description: "自由を愛し、楽観的で哲学的です。探求心と冒険心に溢れています。" }, { sign: "山羊座", start: "12-22", end: "01-19", description: "真面目で責任感が強く、野心的です。現実的で努力を惜しみません。" }, { sign: "水瓶座", start: "01-20", end: "02-18", description: "独創的で博愛主義者です。個性的で、未来志向な考え方をします。" }, { sign: "魚座", start: "02-19", end: "03-20", description: "感受性が豊かで、優しくロマンチストです。共感力が高く、芸術的な才能があります。" } ];
+        function getZodiacSign(date) { if (!date) return null; const month = date.getMonth() + 1; const day = date.getDate(); const currentMonthDay = (month < 10 ? '0' : '') + month + '-' + (day < 10 ? '0' : '') + day; for (const zodiac of zodiacData) { const startMonthDay = zodiac.start; const endMonthDay = zodiac.end; if (zodiac.sign === "山羊座") { if (currentMonthDay >= "12-22" || currentMonthDay <= "01-19") return zodiac; } else { if (currentMonthDay >= startMonthDay && currentMonthDay <= endMonthDay) return zodiac; } } return null;  }
+        function tellWesternAstrologyFortune() { const birthDateValue = astroBirthdateInput.value; if (!birthDateValue) { showMessage("生年月日を入力してください。", "error"); westernAstrologyResultArea.innerHTML = `<p class="new-fortune-title text-center" style="color: red;">生年月日が入力されていません。</p>`; return; } try { const birthDate = new Date(birthDateValue); const userSign = getZodiacSign(birthDate); if (userSign) { westernAstrologyResultArea.innerHTML = `<p class="new-fortune-title">あなたの太陽星座は【${userSign.sign}】です。</p><p class="new-fortune-description">${userSign.description}</p><p class="new-fortune-description text-center" style="margin-top:1rem;">今日の${userSign.sign}のあなたは、新しい視点が開けるかも。柔軟な対応を心がけて。</p>`; } else { westernAstrologyResultArea.innerHTML = `<p class="new-fortune-title text-center" style="color: red;">星座を判定できませんでした。日付を確認してください。</p>`; } } catch (error) { console.error("太陽星座占いでエラー:", error); westernAstrologyResultArea.innerHTML = `<p class="new-fortune-title text-center" style="color: red;">エラーが発生しました。</p>`; showMessage("太陽星座占いでエラーが発生しました。", "error"); } }
+        if(westernAstrologyButton) westernAstrologyButton.addEventListener('click', tellWesternAstrologyFortune);
+
+        // Eastern Astrology (Zodiac Animal) (Existing)
+        const etoData = [ { name: "子 (ねずみ)", description: "順応性があり、機転が利きます。社交的で、集団の中でうまく立ち回れます。" }, { name: "丑 (うし)", description: "粘り強く、誠実です。一度決めたことは最後までやり遂げる意志の強さがあります。" }, { name: "寅 (とら)", description: "情熱的で、チャレンジ精神旺盛です。リーダーシップを発揮し、周囲を引っ張っていきます。" }, { name: "卯 (うさぎ)", description: "穏やかで、愛嬌があります。争いを好まず、平和的な解決を求めます。" }, { name: "辰 (たつ)", description: "理想が高く、エネルギッシュです。大きな夢を抱き、それに向かって突き進みます。" }, { name: "巳 (へび)", description: "探究心が強く、執着心があります。一度興味を持つと深く掘り下げ、粘り強く目標を達成します。" }, { name: "午 (うま)", description: "陽気で、行動力があります。華やかで、人々の注目を集める存在です。" }, { name: "未 (ひつじ)", description: "穏やかで、人情に厚いです。協調性があり、集団の中で和を保ちます。" }, { name: "申 (さる)", description: "器用で、頭の回転が速いです。社交的で、ユーモアのセンスがあります。" }, { name: "酉 (とり)", description: "親切で、世話好きです。先見の明があり、物事を効率的に進めます。" }, { name: "戌 (いぬ)", description: "忠実で、正義感が強いです。誠実で、一度信頼した相手にはとことん尽くします。" }, { name: "亥 (いのしし)", description: "勇猛果敢で、正直者です。目標に向かって一直線に進む強さがあります。" } ];
+        function getEto(year) { if (!year || year < 1900) return null; return etoData[(year - 1900 + 8) % 12];  }
+        function tellEasternAstrologyFortune() { const yearValue = parseInt(birthYearInput.value); if (!yearValue || yearValue < 1900 || yearValue > 2099) { showMessage("有効な生まれ年 (1900-2099) を入力してください。", "error"); easternAstrologyResultArea.innerHTML = `<p class="new-fortune-title text-center" style="color: red;">有効な生まれ年を入力してください。</p>`; return; } try { const userEto = getEto(yearValue); if (userEto) { easternAstrologyResultArea.innerHTML = `<p class="new-fortune-title">あなたの干支は【${userEto.name}】です。</p><p class="new-fortune-description">${userEto.description}</p><p class="new-fortune-description text-center" style="margin-top:1rem;">今日のあなたは、持ち前の${userEto.name.charAt(0)}のような機敏さでチャンスを掴めるかも。</p>`; } else { easternAstrologyResultArea.innerHTML = `<p class="new-fortune-title text-center" style="color: red;">干支を判定できませんでした。</p>`; } } catch (error) { console.error("東洋占術でエラー:", error); easternAstrologyResultArea.innerHTML = `<p class="new-fortune-title text-center" style="color: red;">エラーが発生しました。</p>`; showMessage("東洋占術でエラーが発生しました。", "error"); } }
+        if(easternAstrologyButton) easternAstrologyButton.addEventListener('click', tellEasternAstrologyFortune);
+
+        // --- New Fortune Data & Functions ---
+        const pastLifeAnimalsData = [ { name: "華麗なるペルシャ猫", personality: "優雅さと独立心", description: "あなたは前世で、宮殿で愛されるペルシャ猫でした。その優雅な振る舞いと独立心は、今もあなたの魅力の源です。時には気まぐれな一面も？" }, { name: "天空を翔ける鳳凰", personality: "再生と高貴さ", description: "あなたは前世で、伝説の鳳凰でした。困難を乗り越え再生する力と、比類なき高貴さを持っていました。あなたの魂は今も輝きを放っています。" }, { name: "深海の賢者クラーケン", personality: "計り知れない知恵と神秘", description: "あなたは前世で、深海に潜む巨大なクラーケンでした。その計り知れない知恵と神秘的な雰囲気は、人々を惹きつけ、時に畏怖させたでしょう。" }, { name: "月の砂漠のユニコーン", personality: "純粋さと奇跡を呼ぶ力", description: "あなたは前世で、清らかな心を持つユニコーンでした。その純粋さは奇跡を呼び、多くの傷ついた魂を癒したことでしょう。" } ];
+        function tellPastLifeAnimalFortune() { try { const result = pastLifeAnimalsData[Math.floor(Math.random() * pastLifeAnimalsData.length)]; pastLifeAnimalResultArea.innerHTML = `<p class="new-fortune-title">あなたの前世の動物は…【${result.name}】タイプ！</p><p class="new-fortune-description"><strong>個性:</strong> ${result.personality}</p><p class="new-fortune-description">${result.description}</p>`; } catch (e) { pastLifeAnimalResultArea.innerHTML = `<p class="new-fortune-title" style="color:red;">エラー発生！</p>`; showMessage("前世動物占エラー", "error");}}
+        if(pastLifeAnimalButton) pastLifeAnimalButton.addEventListener('click', tellPastLifeAnimalFortune);
+
+        const pastLifeJobsData = [ { name: "時空を超える発明家", era: "未来都市", tool: "タイムマシン", description: "あなたは前世で、常識を覆す発明で未来都市を驚かせた発明家。その柔軟な発想力と探求心は、現代でも新たな道を切り開くでしょう。" }, { name: "銀河を渡る宇宙海賊船長", era: "大宇宙時代", tool: "宇宙戦艦", description: "あなたは前世で、自由を愛し銀河を股にかけた宇宙海賊の船長。カリスマ性と冒険心で、多くの仲間を率いていました。" }, { name: "魔法図書館の司書", era: "魔法王国", tool: "禁断の魔導書", description: "あなたは前世で、禁断の知識が眠る魔法図書館の司書。知的好奇心が強く、古代の魔法や失われた言語を解読していました。" }, { name: "天空城の宮廷音楽家", era: "ファンタジー世界", tool: "魔法のハープ", description: "あなたは前世で、雲の上に浮かぶ天空城で、神々をも癒す音楽を奏でる宮廷音楽家でした。その旋律は魂を浄化する力を持っていたでしょう。" } ];
+        function tellPastLifeJobFortune() { try { const result = pastLifeJobsData[Math.floor(Math.random() * pastLifeJobsData.length)]; pastLifeJobResultArea.innerHTML = `<p class="new-fortune-title">あなたの前世の職業は…【${result.name}】！</p><p class="new-fortune-description"><strong>時代:</strong> ${result.era} / <strong>キーアイテム:</strong> ${result.tool}</p><p class="new-fortune-description">${result.description}</p>`; } catch (e) {pastLifeJobResultArea.innerHTML = `<p class="new-fortune-title" style="color:red;">エラー発生！</p>`; showMessage("前世職業占エラー", "error");}}
+        if(pastLifeJobButton) pastLifeJobButton.addEventListener('click', tellPastLifeJobFortune);
+
+        const destinyNumberFortunesData = { 1: { name: "超カリスマ・リーダー", description: "圧倒的な指導力と独立心で、不可能を可能にするパイオニア！あなたの行く道が新たな時代を創る！" }, 2: { name: "奇跡の調和ヒーラー", description: "繊細な感受性と共感力で、どんな対立も愛で包み込む平和の使者。あなたの優しさが世界を癒す！" }, 3: { name: "閃きのエンターテイナー", description: "溢れる創造性とユーモアで、世界中に笑顔と感動を届けるスター！あなたの表現が人々を魅了する！" }, 4: { name: "絶対安定のグランドマスター", description: "驚異的な忍耐力と現実的思考で、どんな困難な計画も実現させる建設者。あなたの努力が未来の礎となる！" }, 5: { name: "無限変化のアドベンチャラー", description: "未知なる自由とスリルを求める冒険家！あなたの好奇心と行動力が、世界に新たな風を吹き込む！" }, 6: { name: "宇宙的愛情のガーディアン", description: "海より深い愛情と責任感で、全てを包み込む守護者。あなたの愛が世界を美しく照らす！" }, 7: { name: "真理を探究する賢者", description: "鋭い洞察力と分析力で、宇宙の真理さえも見抜く探求者。あなたの知恵が新たな発見をもたらす！" }, 8: { name: "黄金を掴むアルケミスト", description: "無限のパワーと野心で、どんなものでも成功と豊かさに変える錬金術師！あなたの情熱が奇跡を生む！" }, 9: { name: "銀河レベルの博愛主義者", description: "壮大な理想と慈悲の心で、全宇宙の平和を願う救済者。あなたのスケールの大きな愛が世界を変える！" } };
+        function calculateDestinyNumberInternal(birthDateStr) { if (!birthDateStr) return null; const date = new Date(birthDateStr); const year = date.getFullYear(); const month = date.getMonth() + 1; const day = date.getDate(); let sum = (String(year) + String(month) + String(day)).split('').reduce((acc, digit) => acc + parseInt(digit), 0); while (sum > 9) { if (sum === 11 || sum === 22 || sum === 33) break; sum = String(sum).split('').reduce((acc, digit) => acc + parseInt(digit), 0); } return sum; }
+        function tellDestinyNumberFortune() { const birthDateValue = destinyNumberBirthdateInput.value; if (!birthDateValue) { showMessage("生年月日を入力してください。", "error"); destinyNumberResultArea.innerHTML = `<p class="new-fortune-description text-center" style="color:red;">生年月日を入力してください。</p>`; return; } try { const destinyNum = calculateDestinyNumberInternal(birthDateValue); const fortune = destinyNumberFortunesData[destinyNum] || {name: "特別な運命数 ("+destinyNum+")" , description: "あなたは非常にユニークでパワフルな運命数を持っています！その特別な力を信じ、自分の道を切り開いてください！"}; destinyNumberResultArea.innerHTML = `<p class="new-fortune-title">あなたの運命数は【${destinyNum}】！ タイプ：${fortune.name}</p><p class="new-fortune-description">${fortune.description}</p>`; } catch(e){ destinyNumberResultArea.innerHTML = `<p class="new-fortune-title" style="color:red;">エラー発生！</p>`; showMessage("運命数占エラー", "error"); }}
+        if(destinyNumberButton) destinyNumberButton.addEventListener('click', tellDestinyNumberFortune);
+
+        const sengokuWarlordsData = [ { name: "織田信長", type: "破壊と創造のカリスマ", catchphrase: "是非に及ばず！", description: "既成概念を打ち破る革新者。あなたの前世は、恐れ知らずの第六天魔王かもしれません。"}, { name: "豊臣秀吉", type: "人たらしの天下人", catchphrase: "心配御無用！", description: "人たらしで、知恵と行動力で成り上がった天下人。あなたの前世は、夢を掴む才覚の持ち主だったでしょう。"}, { name: "徳川家康", type: "天下泰平の創業者", catchphrase: "人の一生は重荷を負うて遠き道を行くがごとし...", description: "忍耐と戦略で、最終的に天下を統一した大御所。あなたの前世は、機が熟すのを待つ慎重派だったかもしれません。"}, { name: "上杉謙信", type: "義に生きた軍神", catchphrase: "毘！", description: "私利私欲を捨て、義のために戦い続けた軍神！あなたの清らかな心と圧倒的な武勇は、多くの人々から尊敬を集めるでしょう。"}, { name: "武田信玄", type: "風林火山の智将", catchphrase: "疾きこと風の如く...", description: "巧みな戦略と組織力で、戦国最強と謳われた甲斐の虎！あなたの知略と統率力が、困難な状況を打破します。"} ];
+        function tellSengokuWarlordFortune() { try { const result = sengokuWarlordsData[Math.floor(Math.random() * sengokuWarlordsData.length)]; sengokuWarlordResultArea.innerHTML = `<p class="new-fortune-title">あなたを戦国武将に例えると…【${result.name}】タイプ！</p><p class="new-fortune-description"><strong>異名:</strong> ${result.type}</p><p class="new-fortune-description"><strong>決め台詞:</strong> 「${result.catchphrase}」</p><p class="new-fortune-description">${result.description}</p>`; } catch(e) { sengokuWarlordResultArea.innerHTML = `<p class="new-fortune-title" style="color:red;">エラー発生！</p>`; showMessage("戦国武将占エラー", "error"); }}
+        if(sengokuWarlordButton) sengokuWarlordButton.addEventListener('click', tellSengokuWarlordFortune);
+
+        const guardianDeitiesData = [ { name: "アマテラスオオミカミ (天照大神)", type: "太陽と慈愛の女神", blessing: "無限の創造性と生命力", description: "太陽のように全てを照らし、育む偉大な女神があなたを守護しています。自信を持って、あなたの内なる光を世界に放ちましょう！"}, { name: "スサノオノミコト (素盞嗚尊)", type: "嵐と破壊、そして再生の神", blessing: "困難を打ち破る勇気と変革の力", description: "荒ぶる嵐の力を持ち、古いものを破壊し新たなものを創造する英雄神がついています。どんな困難も、あなたの力で希望に変えられます！"}, { name: "コノハナサクヤヒメ (木花咲耶姫)", type: "美と繁栄、そして儚さの女神", blessing: "華やかな魅力と豊かさの実現", description: "桜の花のように美しく、富士山の神でもある女神があなたに微笑んでいます。その魅力で人々を惹きつけ、豊かな実りを得るでしょう。"}, { name: "ツクヨミノミコト (月読命)", type: "夜と静寂、そして神秘の神", blessing: "深い洞察力と冷静な判断力", description: "静かな夜を支配し、潮の満ち引きを司る神秘的な月神が、あなたの進むべき道を静かに照らしています。内なる声に耳を澄ませて。"} ];
+        function tellGuardianDeityFortune() { try { const result = guardianDeitiesData[Math.floor(Math.random() * guardianDeitiesData.length)]; guardianDeityResultArea.innerHTML = `<p class="new-fortune-title">あなたの守護神は…【${result.name}】！</p><p class="new-fortune-description"><strong>属性:</strong> ${result.type} / <strong>ご利益:</strong> ${result.blessing}</p><p class="new-fortune-description">${result.description}</p>`; } catch(e) { guardianDeityResultArea.innerHTML = `<p class="new-fortune-title" style="color:red;">エラー発生！</p>`; showMessage("守護神占エラー", "error"); }}
+        if(guardianDeityButton) guardianDeityButton.addEventListener('click', tellGuardianDeityFortune);
+        
+        const foodFortunesData = [ { name: "黄金のうな丼デラックス", advice: "スタミナ全開！限界突破！", description: "今日のあなたは鰻登りの運気！最高級のうな丼パワーで、どんな困難も乗り越え、エネルギッシュに活動できるでしょう！"}, { name: "虹色フルーツパフェ・ヘブン", advice: "甘美な誘惑！ハッピーチャージ！", description: "見た目も味も天国級のフルーツパフェが今日のラッキーフード。多彩な魅力が開花し、周囲に笑顔を振りまけるでしょう！ただし食べ過ぎには注意！"}, { name: "宇宙ラーメン・ギャラクシー", advice: "未知との遭遇！インスピレーション爆発！", description: "宇宙の神秘を凝縮したかのようなラーメンが、あなたの創造力を刺激します。斬新なアイデアが次々と湧き出し、不可能を可能にするかも？"}, { name: "ダイヤモンドおにぎり (塩)", advice: "原点回帰！磨けば光る！", description: "シンプルイズベスト！最高級米と至高の塩で握られたおにぎりが、あなたの内なる輝きを引き出します。基本を大切にすることで、大きな成功を掴めるでしょう。"} ];
+        function tellFoodFortune() { try { const result = foodFortunesData[Math.floor(Math.random() * foodFortunesData.length)]; foodFortuneResultArea.innerHTML = `<p class="new-fortune-title">今日のラッキーフードは…【${result.name}】！</p><p class="lucky-item-text" style="font-size:1.2em;">今日のキーフレーズ: 「${result.advice}」</p><p class="new-fortune-description">${result.description}</p>`; } catch(e) { foodFortuneResultArea.innerHTML = `<p class="new-fortune-title" style="color:red;">エラー発生！</p>`; showMessage("食べ物占エラー", "error"); }}
+        if(foodFortuneButton) foodFortuneButton.addEventListener('click', tellFoodFortune);
+
+        const simpleZodiacAdvices = { "牡羊座": { advice: "超速スタートダッシュ！情熱の炎を燃やせ！", luckyItem: "勝負の赤フン" }, "牡牛座": { advice: "極上グルメで五感を刺激！美的センス爆発！", luckyItem: "シルクの枕カバー" }, "双子座": { advice: "情報アンテナMAX！口コミで運気アップ！", luckyItem: "最新ガジェット" }, "蟹座": { advice: "愛深き家族サービス！ホームパーティーで絆を深めろ！", luckyItem: "手作りアルバム" }, "獅子座": { advice: "キングオブスポットライト！自己アピールで注目度No.1！", luckyItem: "金の王冠（の模型）" }, "乙女座": { advice: "パーフェクト分析で問題解決！整理整頓で運気も整う！", luckyItem: "万能ルーペ" }, "天秤座": { advice: "エレガント社交術で人気独占！華麗なる人脈を築け！", luckyItem: "高級ブランドのハンカチ" }, "蠍座": { advice: "ミステリアスな魅力全開！一点集中で真実を見抜け！", luckyItem: "秘密の日記帳" }, "射手座": { advice: "アドベンチャースピリット炸裂！未知の世界へGO！", luckyItem: "世界地図" }, "山羊座": { advice: "野望達成ロードマップ！着実な努力が栄光への道！", luckyItem: "成功者の名言集" }, "水瓶座": { advice: "エキセントリック天才発明家！常識を覆すアイデアを生み出せ！", luckyItem: "UFOのプラモデル" }, "魚座": { advice: "ドリームイマジネーション解放！芸術的センスで世界を癒せ！", luckyItem: "クリスタルの置物" } };
+        function tellSimpleZodiacFortune() { const birthDateValue = simpleZodiacBirthdateInput.value; if (!birthDateValue) { showMessage("生年月日を入力してください。", "error"); simpleZodiacResultArea.innerHTML = `<p class="new-fortune-description text-center" style="color:red;">生年月日を入力してください。</p>`; return; } try { const birthDate = new Date(birthDateValue); const userSignData = getZodiacSign(birthDate); if (userSignData && simpleZodiacAdvices[userSignData.sign]) { const advice = simpleZodiacAdvices[userSignData.sign]; simpleZodiacResultArea.innerHTML = `<p class="new-fortune-title">今日の${userSignData.sign}へのアドバイス</p><p class="new-fortune-description" style="font-size:1.1em; text-align:center; font-weight:bold;">「${advice.advice}」</p><p class="lucky-item-text">ラッキーアイテム: ${advice.luckyItem}</p>`; } else { simpleZodiacResultArea.innerHTML = `<p class="new-fortune-title text-center" style="color: red;">星座を判定できませんでした。日付を確認してください。</p>`; } } catch (error) { console.error("今日の星座アドバイスでエラー:", error); simpleZodiacResultArea.innerHTML = `<p class="new-fortune-title" style="color:red;">エラー発生！</p>`; showMessage("今日の星座アドバイスでエラーが発生しました。", "error"); } }
+        if(simpleZodiacButton) simpleZodiacButton.addEventListener('click', tellSimpleZodiacFortune);
+
+        // 初期タブを設定
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstTabButton = document.querySelector('.tab-button'); 
+            if (firstTabButton) {
+                const onclickAttr = firstTabButton.getAttribute('onclick');
+                if (onclickAttr) {
+                    const matchResult = onclickAttr.match(/'([^']+)'/); 
+                    if (matchResult && matchResult[1]) {
+                        openTab({currentTarget: firstTabButton}, matchResult[1]);
+                    } else { console.error("DOMContentLoaded: Could not extract tab name from first tab's onclick attribute:", onclickAttr); }
+                } else { console.error("DOMContentLoaded: First tab button has no onclick attribute."); }
+            } else { console.error("DOMContentLoaded: No tab buttons found."); }
+        });
+    </script>
+</body>
+</html>
